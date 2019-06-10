@@ -12,6 +12,7 @@ const App = props => {
 
   return (
     <div>
+      <button onClick={() => store.fetchPokemons()}>load</button>
       <input type="text"></input>
       <button onClick={() => store.addPokemon('gigi')}>+</button>
       <div>{JSON.stringify(store)}</div>
