@@ -21,7 +21,7 @@ export const useStore = () => {
   const store = React.useContext(StoreContext);
   if (!store) {
     throw new Error(
-      `Store is 'null'. Ensure that current component is inside of StoreProvider.`
+      `Store is '${store}'. Ensure that current component is inside of StoreProvider.`
     );
   }
   return store;

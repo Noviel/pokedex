@@ -12,7 +12,18 @@ const endpoint = `https://pokeapi.co/api/v2/`;
 export async function getPokemonsList({ page, limit }) {
   const list = await PokeApi.getPokemonsList({ limit, offset: page });
 
-  const pokemons = PokeApi.resource(list.results.map(({ url }) => url))
-  
+  const pokemonsRawData = await PokeApi.resource(
+    list.results.map(poke => {
+      return poke.url;
+    })
+  );
+
+  const pokemons = pokemonsRawData.map(poke => ({
+    name: poke.name,
+    id: poke.id,
+    sprites: poke.sprites,
+    stats: poke.stats,
+  }));
+
   return pokemons;
 }

@@ -1,9 +1,21 @@
-import { observable } from 'mobx';
+import { observable, computed } from 'mobx';
 
 import { getPokemonsList } from '../api';
 
 class Pokedex {
-  @observable pokemons = [];
+  @observable pokemonsById = {};
+  @observable pagination = {
+    page: 0,
+    size: 10,
+  };
+
+  constructor() {
+    if (process.env.NODE_ENV === 'development') {
+      window.pokemons = this.pokemons;
+      window.pokemonsById = this.pokemonsById;
+      window.pagination = this.pagination;
+    }
+  }
 
   addPokemon(name) {
     this.pokemons.push({
@@ -11,8 +23,21 @@ class Pokedex {
     });
   }
 
+  @computed
+  get pokemonsWithPagination() {
+    return Object.keys(this.pokemonsById).map(pokemonId => {
+      return this.pokemonsById[pokemonId];
+    });
+  }
+
   async fetchPokemons() {
-    this.pokemons.push(await getPokemonsList({ limit: 10, offset: 2 }));
+    const pokemons = await getPokemonsList({
+      limit: this.pagination.size,
+      offset: this.pagination.page,
+    });
+    pokemons.forEach(pokemon => {
+      this.pokemonsById[pokemon.id] = pokemon;
+    });
   }
 }
 
