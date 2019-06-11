@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 const PokemonCard = props => {
   return (
     <div>
-      <img src={props.sprites.front_default}></img>
+      {props.sprites && <img src={props.sprites.front_default}></img>}
       {props.name}
     </div>
   );

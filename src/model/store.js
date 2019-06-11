@@ -1,20 +1,63 @@
-import { observable, computed } from 'mobx';
+import { action, reaction, observable, computed } from 'mobx';
 
-import { getPokemonsList } from '../api';
+import {
+  getPokemonsList,
+  getAllPokemonsNamesAndIds,
+  getPokemonByName,
+} from '../api';
+
+class Pagination {
+  @observable page = 0;
+  @observable size = 10;
+}
 
 class Pokedex {
-  @observable pokemonsById = {};
-  @observable pagination = {
-    page: 0,
-    size: 10,
-  };
+  @observable pokemonsByName = {};
+
+  @observable search = '';
+  @observable tags = [];
+
+  @observable allPokemons = [];
+
+  @observable
+  pagination = new Pagination();
+
+  @observable
+  visiblePokemons = [];
 
   constructor() {
     if (process.env.NODE_ENV === 'development') {
       window.pokemons = this.pokemons;
-      window.pokemonsById = this.pokemonsById;
+      window.pokemonsByName = this.pokemonsByName;
       window.pagination = this.pagination;
     }
+
+    this.startApp();
+  }
+
+  startApp() {
+    this.fetchAllPokemonsNamesAndIds();
+    this.fetchPokemonsCurrentPage();
+
+    reaction(
+      () => this.searchedPokemons,
+      pokemons => {
+        if (pokemons.length) {
+          const promisedPokemons = pokemons.map(this.getOrLoadPokemon);
+
+          Promise.all(promisedPokemons).then(_ => {
+            this.visiblePokemons = pokemons;
+          });
+        }
+      }
+    );
+
+    reaction(
+      () => this.pagination.page,
+      page => {
+        this.fetchPokemonsCurrentPage();
+      }
+    );
   }
 
   addPokemon(name) {
@@ -23,24 +66,65 @@ class Pokedex {
     });
   }
 
+  getOrLoadPokemon = async name => {
+    if (this.pokemonsByName[name]) {
+      return this.pokemonsByName[name];
+    }
+    const pokemon = await getPokemonByName(name);
+    this.pokemonsByName[pokemon.name] = pokemon;
+    return pokemon;
+  };
+
   @computed
-  get pokemonsWithPagination() {
-    return Object.keys(this.pokemonsById).map(pokemonId => {
-      return this.pokemonsById[pokemonId];
-    });
+  get searchedPokemons() {
+    if (this.search === '' || this.search.length < 2) {
+      return [];
+    }
+    const result = this.allPokemons
+      .filter(({ name }) => name.includes(this.search))
+      .map(({ name }) => name);
+
+    return result;
   }
 
-  async fetchPokemons() {
+  @action
+  nextPage() {
+    this.pagination.page++;
+  }
+
+  updateVisiblePokemons() {}
+
+  async fetchAllPokemonsNamesAndIds() {
+    const pokemons = await getAllPokemonsNamesAndIds();
+    this.allPokemons = pokemons;
+  }
+
+  async fetchPokemonsCurrentPage() {
     const pokemons = await getPokemonsList({
-      limit: this.pagination.size,
-      offset: this.pagination.page,
+      page: this.pagination.page,
+      size: this.pagination.size,
     });
+
     pokemons.forEach(pokemon => {
-      this.pokemonsById[pokemon.id] = pokemon;
+      this.pokemonsByName[pokemon.name] = pokemon;
     });
+
+    this.visiblePokemons = pokemons.map(({ name }) => name);
   }
 }
 
 export const createStore = () => {
-  return new Pokedex();
+  const store = new Pokedex();
+
+  if (process.env.NODE_ENV === 'development') {
+    reaction(
+      () => store.allPokemons,
+      pokemons => {
+        console.log(`Got all pokemons metadata`);
+        console.log(pokemons);
+      }
+    );
+  }
+
+  return store;
 };

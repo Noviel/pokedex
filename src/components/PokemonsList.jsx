@@ -12,10 +12,9 @@ const PokemonsList = () => {
       {() => (
         <div>
           <pre>
-            Loaded pokemons:
-            {!!store.pokemonsWithPagination.length &&
-              store.pokemonsWithPagination.map(pokemon => (
-                <PokemonCard key={pokemon.id} {...pokemon} />
+            {!!store.visiblePokemons.length &&
+              store.visiblePokemons.map(pokemon => (
+                <PokemonCard key={pokemon} {...store.pokemonsByName[pokemon]} />
               ))}
           </pre>
         </div>
@@ -24,4 +23,4 @@ const PokemonsList = () => {
   );
 };
 
-export { PokemonsList }
+export { PokemonsList };

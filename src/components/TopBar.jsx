@@ -1,15 +1,13 @@
 import React from 'react';
 
-import { useStore } from './StoreContext';
+import { Search } from './ui/Search';
+import { Tags } from './ui/Tags';
 
 const TopBar = () => {
-  const { fetchPokemons } = useStore();
-
   return (
     <div>
-      <button onClick={() => fetchPokemons()}>load</button>
-      <label>Search</label>
-      <input type="text"></input>
+      <Search />
+      <Tags />
     </div>
   );
 };
