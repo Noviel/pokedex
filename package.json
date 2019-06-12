@@ -25,6 +25,7 @@
   },
   "dependencies": {
     "@material-ui/core": "^4.1.0",
+    "@material-ui/icons": "^4.1.0",
     "mobx": "^5.10.1",
     "mobx-react-lite": "^1.4.0",
     "mobx-utils": "^5.4.1",

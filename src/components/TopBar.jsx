@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Search } from './ui/Search';
+import { Search } from './Search';
 import { Tags } from './ui/Tags';
 
 const TopBar = () => {
