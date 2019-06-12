@@ -12,6 +12,8 @@ const PokemonsList = () => {
       {() => (
         <div>
           <pre>
+            {store.pokemonsNotFound ? <div>NotFound</div> : ''}
+            {store.searchStatus}
             {!!store.visiblePokemons.length &&
               store.visiblePokemons.map(pokemon => (
                 <PokemonCard key={pokemon} {...store.pokemonsByName[pokemon]} />

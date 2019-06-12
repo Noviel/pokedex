@@ -33,7 +33,11 @@ const convertPokemonToFrontendModel = pokemon => ({
   name: pokemon.name,
   id: pokemon.id,
   sprites: pokemon.sprites,
-  stats: pokemon.stats,
+  stats: pokemon.stats.map(({ base_stat, stat: { name } }) => ({
+    value: base_stat,
+    name,
+  })),
+  types: pokemon.types.map(({ type }) => ({ name: type.name })),
 });
 
 export async function getPokemonByName(name) {

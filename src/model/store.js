@@ -11,13 +11,15 @@ class Pagination {
   @observable size = 10;
 }
 
+const MINIMAL_SEARCH_LENGTH = 2;
+
 class Pokedex {
+  @observable allPokemons = [];
   @observable pokemonsByName = {};
 
   @observable search = '';
+  @observable isSearchActive = true;
   @observable tags = [];
-
-  @observable allPokemons = [];
 
   @observable
   pagination = new Pagination();
@@ -30,6 +32,14 @@ class Pokedex {
       window.pokemons = this.pokemons;
       window.pokemonsByName = this.pokemonsByName;
       window.pagination = this.pagination;
+
+      reaction(
+        () => this.allPokemons,
+        pokemons => {
+          console.log(`Got all pokemons metadata`);
+          console.log(pokemons);
+        }
+      );
     }
 
     this.startApp();
@@ -40,9 +50,9 @@ class Pokedex {
     this.fetchPokemonsCurrentPage();
 
     reaction(
-      () => this.searchedPokemons,
-      pokemons => {
-        if (pokemons.length) {
+      () => [this.searchedPokemons, this.isSearchActive],
+      ([pokemons, isSearchActive]) => {
+        if (isSearchActive) {
           const promisedPokemons = pokemons.map(this.getOrLoadPokemon);
 
           Promise.all(promisedPokemons).then(_ => {
@@ -77,7 +87,7 @@ class Pokedex {
 
   @computed
   get searchedPokemons() {
-    if (this.search === '' || this.search.length < 2) {
+    if (this.search === '' || this.search.length < MINIMAL_SEARCH_LENGTH) {
       return [];
     }
     const result = this.allPokemons
@@ -85,6 +95,22 @@ class Pokedex {
       .map(({ name }) => name);
 
     return result;
+  }
+
+  @computed
+  get searchStatus() {
+    if (this.search.length < MINIMAL_SEARCH_LENGTH) {
+      return `You need to enter atleast ${MINIMAL_SEARCH_LENGTH} symbols`;
+    }
+    return '';
+  }
+
+  @computed
+  get pokemonsNotFound() {
+    return (
+      this.search.length >= MINIMAL_SEARCH_LENGTH &&
+      this.searchedPokemons.length === 0
+    );
   }
 
   @action
@@ -115,16 +141,6 @@ class Pokedex {
 
 export const createStore = () => {
   const store = new Pokedex();
-
-  if (process.env.NODE_ENV === 'development') {
-    reaction(
-      () => store.allPokemons,
-      pokemons => {
-        console.log(`Got all pokemons metadata`);
-        console.log(pokemons);
-      }
-    );
-  }
 
   return store;
 };
