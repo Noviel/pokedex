@@ -1,11 +1,13 @@
 import React from 'react';
 import { Observer } from 'mobx-react-lite';
 
-import { Filter } from './SearchToggler';
+import SearchIcon from '@material-ui/icons/Search';
 
-import { useStore } from './StoreContext';
+import { SearchToggler } from './SearchToggler';
 
-import { Search as SearchUI } from './ui/Search';
+import { useStore } from '../../StoreContext';
+
+import { Input } from '../../ui/Input';
 
 const Search = () => {
   const store = useStore();
@@ -13,13 +15,16 @@ const Search = () => {
     <Observer>
       {() => (
         <>
-          <SearchUI
+          <Input
+            placeholder="Search Pokemon by name"
+            label="Search"
+            prependIcon={<SearchIcon />}
             onChange={e => {
               store.search = e.target.value;
             }}
             disabled={!store.isSearchActive}
           />
-          <Filter />
+          <SearchToggler />
         </>
       )}
     </Observer>

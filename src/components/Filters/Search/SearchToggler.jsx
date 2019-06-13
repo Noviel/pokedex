@@ -1,9 +1,9 @@
-import React, { useCallback } from 'react';
+import React from 'react';
 import { Observer } from 'mobx-react-lite';
 
 import Switch from '@material-ui/core/Switch';
 
-import { useStore } from './StoreContext';
+import { useStore } from '../../StoreContext';
 
 const SearchToggler = () => {
   const store = useStore();
@@ -22,4 +22,4 @@ const SearchToggler = () => {
   );
 };
 
-export { SearchToggler as Filter };
+export { SearchToggler };

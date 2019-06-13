@@ -3,7 +3,7 @@ import { Observer } from 'mobx-react-lite';
 
 import { useStore } from './StoreContext';
 
-import { PokemonCard } from './PokemonCard';
+import { PokemonListItem } from './PokemonListItem';
 
 const PokemonsList = () => {
   const store = useStore();
@@ -15,8 +15,12 @@ const PokemonsList = () => {
             {store.pokemonsNotFound ? <div>NotFound</div> : ''}
             {store.searchStatus}
             {!!store.visiblePokemons.length &&
-              store.visiblePokemons.map(pokemon => (
-                <PokemonCard key={pokemon} {...store.pokemonsByName[pokemon]} />
+              store.visiblePokemons.map(({ name, status }) => (
+                <PokemonListItem
+                  key={name}
+                  name={name}
+                  isOpen={status === 'open'}
+                />
               ))}
           </pre>
         </div>

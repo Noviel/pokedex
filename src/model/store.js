@@ -1,4 +1,5 @@
 import { action, reaction, observable, computed } from 'mobx';
+import { computedFn } from 'mobx-utils';
 
 import {
   getPokemonsList,
@@ -6,9 +7,37 @@ import {
   getPokemonByName,
 } from '../api';
 
+const defaultPageSizes = [10, 20, 50];
+
 class Pagination {
+  sizes = defaultPageSizes;
   @observable page = 0;
   @observable size = 10;
+
+  constructor({ parent, sizes } = {}) {
+    if (sizes) {
+      this.sizes = sizes;
+    }
+
+    reaction(
+      () => this.size,
+      size => {
+        /*
+          Calculate new page index based on previous pagination state
+        */
+        const offset = this.page * this.size;
+        this.size = size;
+        this.page = offset / size;
+
+        console.log(
+          'calculated new page index ',
+          this.page,
+          'for size',
+          this.size
+        );
+      }
+    );
+  }
 }
 
 const MINIMAL_SEARCH_LENGTH = 2;
@@ -19,11 +48,16 @@ class Pokedex {
 
   @observable search = '';
   @observable isSearchActive = true;
-  @observable tags = [];
 
-  @observable
-  pagination = new Pagination();
+  @observable tags = ['poison'];
+  @observable isTagsActive = true;
 
+  pagination = new Pagination({ parent: this });
+  paginationWithFilters = new Pagination({ parent: this });
+
+  /*
+    Names of pokemons to display
+  */
   @observable
   visiblePokemons = [];
 
@@ -47,7 +81,7 @@ class Pokedex {
 
   startApp() {
     this.fetchAllPokemonsNamesAndIds();
-    this.fetchPokemonsCurrentPage();
+    this.fetchPokemonsForPage(0);
 
     reaction(
       () => [this.searchedPokemons, this.isSearchActive],
@@ -56,8 +90,14 @@ class Pokedex {
           const promisedPokemons = pokemons.map(this.getOrLoadPokemon);
 
           Promise.all(promisedPokemons).then(_ => {
-            this.visiblePokemons = pokemons;
+            this.visiblePokemons = pokemons.map(pokemon => ({
+              name: pokemon,
+              status: 'closed',
+            }));
+            this.pagination.page = 0;
           });
+        } else {
+          console.log('search is deactivated');
         }
       }
     );
@@ -65,7 +105,7 @@ class Pokedex {
     reaction(
       () => this.pagination.page,
       page => {
-        this.fetchPokemonsCurrentPage();
+        this.fetchPokemonsForPage(page);
       }
     );
   }
@@ -113,21 +153,26 @@ class Pokedex {
     );
   }
 
-  @action
-  nextPage() {
-    this.pagination.page++;
-  }
+  getPokemon = name => {
+    return this.pokemonsByName[name];
+  };
 
-  updateVisiblePokemons() {}
+  @action
+  updateVisiblePokemons(names) {
+    this.visiblePokemons = names.map(name => ({
+      name,
+      status: 'closed',
+    }));
+  }
 
   async fetchAllPokemonsNamesAndIds() {
     const pokemons = await getAllPokemonsNamesAndIds();
     this.allPokemons = pokemons;
   }
 
-  async fetchPokemonsCurrentPage() {
+  async fetchPokemonsForPage(page) {
     const pokemons = await getPokemonsList({
-      page: this.pagination.page,
+      page,
       size: this.pagination.size,
     });
 
@@ -135,7 +180,45 @@ class Pokedex {
       this.pokemonsByName[pokemon.name] = pokemon;
     });
 
-    this.visiblePokemons = pokemons.map(({ name }) => name);
+    this.updateVisiblePokemons(pokemons.map(({ name }) => name));
+  }
+
+  @action
+  toggleSearch = () => {
+    this.isSearchActive = !this.isSearchActive;
+  };
+
+  @action
+  addTag = tag => {
+    if (!this.tags.includes(tag)) {
+      this.tags.push(tag);
+    }
+  };
+
+  @action
+  removeTag = tag => {
+    this.tags = this.tags.filter(t => t !== tag);
+  };
+
+  isNewTag = computedFn(function isNewTag(tag) {
+    return !this.tags.includes(tag);
+  });
+
+  @action
+  setPageSize = sizeIndex => {
+    this.pagination.size = this.pagination.sizes[sizeIndex];
+  };
+
+  @action
+  nextPage() {
+    this.pagination.page++;
+  }
+
+  @action
+  prevPage() {
+    if (this.pagination.page !== 0) {
+      this.pagination.page--;
+    }
   }
 }
 

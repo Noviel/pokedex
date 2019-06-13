@@ -1,13 +1,16 @@
 import React from 'react';
 
-import { Search } from './Search';
-import { Tags } from './ui/Tags';
+import { Search } from './Filters/Search/Search';
+
+import { TagsList } from './Filters/Tags/TagsList';
+import { AddTag } from './Filters/Tags/AddTag';
 
 const TopBar = () => {
   return (
     <div>
       <Search />
-      <Tags />
+      <AddTag />
+      <TagsList />
     </div>
   );
 };

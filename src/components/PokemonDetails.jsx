@@ -7,24 +7,28 @@ import CardHeader from '@material-ui/core/CardHeader';
 
 import Typography from '@material-ui/core/Typography';
 
-const PokemonCard = props => {
+import { useStore } from './StoreContext';
+
+const PokemonDetails = ({ name }) => {
+  const store = useStore();
+  const pokemon = store.getPokemon(name);
   return (
     <div>
       <Card>
         <CardHeader
-          title={props.name}
+          title={pokemon.name}
           titleTypographyProps={{ align: 'center' }}
         />
         <CardContent>
           <div>
-            {props.sprites && <img src={props.sprites.front_default}></img>}
+            {pokemon.sprites && <img src={pokemon.sprites.front_default}></img>}
             <Typography variant="h6" color="textSecondary">
-              {props.types.map(({ name }) => (
+              {pokemon.types.map(({ name }) => (
                 <div key={name}>{name}</div>
               ))}
             </Typography>
             <Typography variant="h6" color="textSecondary">
-              {props.stats.map(({ name, value }) => (
+              {pokemon.stats.map(({ name, value }) => (
                 <div key={name}>
                   {name} {value}
                 </div>
@@ -37,23 +41,8 @@ const PokemonCard = props => {
   );
 };
 
-PokemonCard.propTypes = {
-  id: PropTypes.number,
+PokemonDetails.propTypes = {
   name: PropTypes.string,
-  sprites: PropTypes.shape({
-    front_default: PropTypes.string,
-  }),
-  types: PropTypes.arrayOf(
-    PropTypes.shape({
-      name: PropTypes.string,
-    })
-  ),
-  stats: PropTypes.arrayOf(
-    PropTypes.shape({
-      name: PropTypes.string,
-      value: PropTypes.number,
-    })
-  ),
 };
 
-export { PokemonCard };
+export { PokemonDetails };

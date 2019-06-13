@@ -5,7 +5,6 @@ import { makeStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import InputBase from '@material-ui/core/InputBase';
 import IconButton from '@material-ui/core/IconButton';
-import SearchIcon from '@material-ui/icons/Search';
 
 const useStyles = makeStyles({
   root: {
@@ -28,28 +27,52 @@ const useStyles = makeStyles({
   },
 });
 
-const Search = ({ onChange, disabled }) => {
+const Input = props => {
+  const {
+    inputProps = {},
+    label,
+    onChange,
+    disabled,
+    prependIcon,
+    placeholder,
+    value,
+  } = props;
+  console.log(props);
   const classes = useStyles();
 
   return (
     <Paper className={classes.root}>
-      <IconButton className={classes.iconButton} aria-label="Search">
-        <SearchIcon />
-      </IconButton>
+      {prependIcon && (
+        <IconButton className={classes.iconButton} aria-label={label}>
+          {prependIcon}
+        </IconButton>
+      )}
       <InputBase
         className={classes.input}
-        placeholder="Search Pokemon by name"
-        inputProps={{ 'aria-label': 'Search Pokemon by name' }}
+        placeholder={placeholder}
+        inputProps={{ 'aria-label': placeholder }}
         onChange={onChange}
         disabled={disabled}
+        value={value}
+        {...inputProps}
       />
     </Paper>
   );
 };
 
-Search.propTypes = {
-  onChange: PropTypes.function,
+Input.propTypes = {
+  onChange: PropTypes.func,
   disabled: PropTypes.bool,
+  prependIcon: PropTypes.node,
+  appendIcon: PropTypes.node,
+  label: PropTypes.string,
+  placeholder: PropTypes.string,
+  inputProps: PropTypes.object,
+  value: PropTypes.any
 };
 
-export { Search };
+Input.defaultProps = {
+  inputProps: {},
+};
+
+export { Input };
