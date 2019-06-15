@@ -1,18 +1,17 @@
 import React from 'react';
 import { Observer } from 'mobx-react-lite';
 
-import { Switch } from '../../ui/Switch';
+import { Switch } from '../ui/Switch';
 
-import { useStore } from '../../StoreContext';
+import { useStore } from '../StoreContext';
 
-const SearchToggler = () => {
+const FilterModeToggler = () => {
   const store = useStore();
-
   return (
     <Observer>
       {() => (
         <>
-          Full base search
+          Global search
           <Switch
             checked={store.isGlobalSearch}
             onChange={store.toggleSearchMode}
@@ -23,4 +22,4 @@ const SearchToggler = () => {
   );
 };
 
-export { SearchToggler };
+export { FilterModeToggler };

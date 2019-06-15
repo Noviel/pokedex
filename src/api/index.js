@@ -73,7 +73,19 @@ export async function getStats() {
 }
 
 export async function getTypes() {
-  const stats = await PokeApi.getTypesList();
+  const types = await PokeApi.getTypesList();
 
-  return stats;
+  const typesDetails = await PokeApi.resource(
+    types.results.map(({ url }) => url)
+  );
+
+  
+  const typesMap = typesDetails.reduce((result, type) => {
+    result[type.name] = type;
+    return result;
+  }, {});
+
+  return typesMap;
 }
+
+export async function getPokemonsByType(type) {}

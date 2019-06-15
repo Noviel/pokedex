@@ -3,8 +3,6 @@ import { Observer } from 'mobx-react-lite';
 
 import SearchIcon from '@material-ui/icons/Search';
 
-import { SearchToggler } from './SearchToggler';
-
 import { useStore } from '../../StoreContext';
 
 import { Input } from '../../ui/Input';
@@ -24,7 +22,6 @@ const Search = () => {
             }}
             disabled={!store.isSearchActive}
           />
-          <SearchToggler />
         </>
       )}
     </Observer>

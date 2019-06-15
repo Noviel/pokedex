@@ -1,3 +1,4 @@
+import uniq from 'lodash.uniq';
 import { action, reaction, observable, computed } from 'mobx';
 import { computedFn } from 'mobx-utils';
 
@@ -76,15 +77,11 @@ class Pokedex {
 
   @observable search = '';
   @observable isSearchActive = true;
-  @observable isGlobalSearch = true;
 
   @observable tags = [];
   @observable isTagsActive = true;
-  @observable isGlobalTags = false;
-  /*
-    True if pokemons are filtered by either tags or search
-  */
-  @observable isFiltered = false;
+
+  @observable isGlobalSearch = false;
 
   pagination = new Pagination({ parent: this });
   paginationWithFilters = new Pagination({ parent: this });
@@ -94,8 +91,7 @@ class Pokedex {
   */
   @computed
   get visiblePokemons() {
-    const isFiltered = this.search.length || this.tags.length;
-    return isFiltered
+    return this.isFiltered
       ? this.filteredPokemons.slice(
           this.pagination.offset,
           this.pagination.offset + this.pagination.size
@@ -129,18 +125,26 @@ class Pokedex {
     this.fetchAllPokemonsNamesAndIds();
     this.fetchPokemonsForPage(0);
     getStats().then(stats => console.log(stats));
-    getTypes().then(stats => console.log(stats));
-
+    getTypes().then(typesMap => {
+      this.allTags = typesMap;
+    });
     reaction(
       () => [this.filteredPokemons],
       ([pokemons]) => {
-        if (this.tags.length || this.search.length) {
+        if (this.isFiltered) {
           const promisedPokemons = pokemons.map(this.getOrLoadPokemon);
 
           Promise.all(promisedPokemons).then(_ => {
             this.pagination.page = 0;
           });
         }
+      }
+    );
+
+    reaction(
+      () => this.allTags,
+      tags => {
+        Object.keys(tags).map(t => console.log(t.name));
       }
     );
 
@@ -162,7 +166,7 @@ class Pokedex {
     reaction(
       () => [this.pagination.page],
       ([page]) => {
-        if (this.tags.length || this.search.length) {
+        if (this.isFiltered) {
           // this.visiblePokemons = this.filteredPokemons.slice(
           //   page * this.pagination.size,
           //   (1 + page) * this.pagination.size
@@ -176,7 +180,7 @@ class Pokedex {
     reaction(
       () => [this.pagination.size],
       ([size]) => {
-        if (!this.tags.length && !this.search.length) {
+        if (!this.isFiltered) {
           if (this.pagination.prevSize < size) {
             this.fetchPokemonsForPage(this.pagination.page);
           } else if (this.pagination.prevSize > size) {
@@ -197,19 +201,19 @@ class Pokedex {
   @action
   setAllPokemons = pokemons => {
     this.allPokemons = pokemons;
-  }
+  };
 
   @action
   setPokemonData = pokemon => {
     this.pokemonsByName[pokemon.name] = pokemon;
-  }
+  };
 
   @action
   setPokemonsData = pokemons => {
     pokemons.forEach(pokemon => {
       this.pokemonsByName[pokemon.name] = pokemon;
     });
-  }
+  };
 
   getOrLoadPokemon = async name => {
     if (this.pokemonsByName[name]) {
@@ -223,7 +227,7 @@ class Pokedex {
 
   @computed
   get filteredPokemons() {
-    let result = this.pokemonsCurrentPage;
+    let result = [];
 
     if (this.search.length >= MINIMAL_SEARCH_LENGTH) {
       const list = this.isGlobalSearch
@@ -237,15 +241,24 @@ class Pokedex {
 
     if (this.tags.length) {
       /* `result` can contain names of not fetched pokemons, skip them for now */
-      const pokemonsWithAnyTag = this.pokemonsByNameList.filter(name =>
-        this.pokemonsByName[name].types.some(({ name }) =>
-          this.tags.includes(name)
-        )
-      );
-      result = result.filter(name => pokemonsWithAnyTag.includes(name));
+      const pokemonsWithAnyTag = !this.isGlobalSearch
+        ? this.pokemonsByNameList.filter(name =>
+            this.pokemonsByName[name].types.some(({ name }) =>
+              this.tags.includes(name)
+            )
+          )
+        : Object.keys(this.allTags)
+            .filter(tag => this.tags.includes(tag))
+            .flatMap(tag => this.allTags[tag].pokemon)
+            .filter(uniq)
+            .map(({ pokemon: { name } }) => name);
+
+      result = result.length
+        ? result.filter(name => pokemonsWithAnyTag.includes(name))
+        : pokemonsWithAnyTag;
     }
 
-    return result;
+    return result.length ? result : this.pokemonsCurrentPage;
   }
 
   @computed
@@ -263,10 +276,7 @@ class Pokedex {
 
   @computed
   get pokemonsNotFound() {
-    return (
-      this.tags.length ||
-      (this.search.length && this.filteredPokemons.length === 0)
-    );
+    return this.isFiltered && this.filteredPokemons.length === 0;
   }
 
   getPokemon = name => {
@@ -301,14 +311,16 @@ class Pokedex {
 
   @action
   toggleSearchMode = () => {
-    this.isGlobalSearch = !this.isGlobalSearch;
+    if (this.isGlobalSearchReady) {
+      this.isGlobalSearch = !this.isGlobalSearch;
+    }
   };
 
-  @action
-  toggleTagsMode = () => {
-    // Seems like there is no API to query pokemons by type tag
-    // So for now toggling is disabled
-  };
+  @computed
+  get isGlobalSearchReady() {
+    // Global search is ready if types with belonging pokemons and list of all pokemons are fetched
+    return Object.keys(this.allTags).length;
+  }
 
   @action
   addTag = tag => {
@@ -334,8 +346,7 @@ class Pokedex {
 
   @computed
   get isNextPageAvailable() {
-    const isFiltered = this.search.length || this.tags.length;
-    return isFiltered
+    return this.isFiltered
       ? this.pagination.offset + this.pagination.size <
           this.filteredPokemons.length
       : this.visiblePokemons.length >= this.filteredPokemons.length;

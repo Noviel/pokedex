@@ -13,9 +13,11 @@ const useStyles = makeStyles(theme => ({
 const Tag = ({ onDelete, label, icon }) => {
   const classes = useStyles();
 
-  const handleDelete = () => {
-    onDelete(label);
-  };
+  const handleDelete = onDelete
+    ? () => {
+        onDelete(label);
+      }
+    : undefined;
 
   return (
     <Chip
