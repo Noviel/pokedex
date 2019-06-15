@@ -65,3 +65,15 @@ export async function getPokemonsList({ page, size }) {
 
   return pokemons;
 }
+
+export async function getStats() {
+  const stats = await PokeApi.getStatsList();
+
+  return stats;
+}
+
+export async function getTypes() {
+  const stats = await PokeApi.getTypesList();
+
+  return stats;
+}
