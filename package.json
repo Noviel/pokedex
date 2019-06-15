@@ -1,7 +1,7 @@
 {
   "name": "pokedex-frontend",
   "version": "0.1.0",
-  "description": "Just another Pokedex",
+  "description": "Just a little Pokedex built with React and MobX",
   "main": "index.js",
   "repository": "http://github.com/Noviel/pokedex-frontend",
   "author": "Alexander \"Snov\" Semenchenko",
