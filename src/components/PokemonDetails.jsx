@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { observer } from 'mobx-react-lite';
 
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
@@ -7,42 +8,37 @@ import CardHeader from '@material-ui/core/CardHeader';
 
 import Typography from '@material-ui/core/Typography';
 
+import { PokemonStats } from './PokemonStats';
+import { PokemonTags } from './PokemonTags';
+import { PokemonAvatar } from './PokemonAvatar';
+
 import { useStore } from './StoreContext';
 
-const PokemonDetails = ({ name }) => {
+const PokemonInfo = observer(({ name }) => {
   const store = useStore();
   const pokemon = store.getPokemon(name);
+  if (!pokemon) {
+    return <div />;
+  }
   return (
-    <div>
-      <Card>
-        <CardHeader
-          title={pokemon.name}
-          titleTypographyProps={{ align: 'center' }}
-        />
-        <CardContent>
-          <div>
-            {pokemon.sprites && <img src={pokemon.sprites.front_default}></img>}
-            <Typography variant="h6" color="textSecondary">
-              {pokemon.types.map(({ name }) => (
-                <div key={name}>{name}</div>
-              ))}
-            </Typography>
-            <Typography variant="h6" color="textSecondary">
-              {pokemon.stats.map(({ name, value }) => (
-                <div key={name}>
-                  {name} {value}
-                </div>
-              ))}
-            </Typography>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
+    <Card>
+      <CardHeader
+        title={pokemon.name}
+        titleTypographyProps={{ align: 'center' }}
+      />
+      <CardContent>
+        <div>
+          <PokemonAvatar name={name} />
+          <PokemonTags name={name} />
+          <PokemonStats name={name} />
+        </div>
+      </CardContent>
+    </Card>
   );
-};
+});
 
-PokemonDetails.propTypes = {
+PokemonInfo.propTypes = {
   name: PropTypes.string,
 };
 
-export { PokemonDetails };
+export { PokemonInfo };

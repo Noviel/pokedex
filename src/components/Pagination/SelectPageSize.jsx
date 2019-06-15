@@ -15,17 +15,16 @@ import { useStore } from '../StoreContext';
 const SelectPageSize = () => {
   const [open, setOpen] = React.useState(false);
   const anchorRef = React.useRef(null);
-  const [selectedIndex, setSelectedIndex] = React.useState(1);
 
   const store = useStore();
   const options = store.pagination.sizes;
+  const selectedIndex = store.pagination.sizeIndex;
 
   function handleClick() {
     alert(`You clicked ${options[selectedIndex]}`);
   }
 
   function handleMenuItemClick(event, index) {
-    setSelectedIndex(index);
     setOpen(false);
     store.setPageSize(index);
   }
@@ -77,7 +76,6 @@ const SelectPageSize = () => {
                   {options.map((option, index) => (
                     <MenuItem
                       key={option}
-                      disabled={index === 2}
                       selected={index === selectedIndex}
                       onClick={event => handleMenuItemClick(event, index)}
                     >

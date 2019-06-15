@@ -5,22 +5,15 @@ import { Switch } from '../../ui/Switch';
 
 import { useStore } from '../../StoreContext';
 
-const SearchToggler = () => {
+const FilterModeToggler = () => {
   const store = useStore();
-
   return (
     <Observer>
       {() => (
-        <>
-          Full base search
-          <Switch
-            checked={store.isGlobalSearch}
-            onChange={store.toggleSearchMode}
-          />
-        </>
+        <Switch checked={store.isGlobalTags} onChange={store.toggleTagsMode} />
       )}
     </Observer>
   );
 };
 
-export { SearchToggler };
+export { FilterModeToggler };

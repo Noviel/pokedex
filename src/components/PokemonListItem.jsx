@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { PokemonDetails } from './PokemonDetails';
-import { PokemonInfo } from './PokemonInfo';
+import { PokemonInfo } from './PokemonDetails';
 
 const PokemonListItem = ({ isOpen, name }) => {
   const component = isOpen ? (

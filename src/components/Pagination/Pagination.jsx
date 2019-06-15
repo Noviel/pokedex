@@ -33,7 +33,7 @@ const Pagination = () => {
           >
             <ArrowLeft />
           </Button>
-          {store.pagination.page}
+          {store.pagination.page + 1}
           <Button
             color="primary"
             variant="contained"

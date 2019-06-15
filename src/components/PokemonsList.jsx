@@ -12,16 +12,14 @@ const PokemonsList = () => {
       {() => (
         <div>
           <pre>
-            {store.pokemonsNotFound ? <div>NotFound</div> : ''}
             {store.searchStatus}
-            {!!store.visiblePokemons.length &&
-              store.visiblePokemons.map(({ name, status }) => (
-                <PokemonListItem
-                  key={name}
-                  name={name}
-                  isOpen={status === 'open'}
-                />
-              ))}
+            {store.visiblePokemons.length ? (
+              store.visiblePokemons.map(name => (
+                <PokemonListItem key={name} name={name} />
+              ))
+            ) : (
+              <div>NotFound</div>
+            )}
           </pre>
         </div>
       )}
