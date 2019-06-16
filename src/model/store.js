@@ -227,6 +227,10 @@ class Pokedex {
 
   @computed
   get filteredPokemons() {
+    if (!this.isFiltered) {
+      return this.pokemonsCurrentPage;
+    }
+
     let result = [];
 
     if (this.search.length >= MINIMAL_SEARCH_LENGTH) {
@@ -240,7 +244,6 @@ class Pokedex {
     }
 
     if (this.tags.length) {
-      /* `result` can contain names of not fetched pokemons, skip them for now */
       const pokemonsWithAnyTag = !this.isGlobalSearch
         ? this.pokemonsByNameList.filter(name =>
             this.pokemonsByName[name].types.some(({ name }) =>
@@ -258,12 +261,12 @@ class Pokedex {
         : pokemonsWithAnyTag;
     }
 
-    return result.length ? result : this.pokemonsCurrentPage;
+    return result;
   }
 
   @computed
   get isFiltered() {
-    return this.tags.length || this.search.length;
+    return this.tags.length || this.search.length >= MINIMAL_SEARCH_LENGTH;
   }
 
   @computed
@@ -319,7 +322,7 @@ class Pokedex {
   @computed
   get isGlobalSearchReady() {
     // Global search is ready if types with belonging pokemons and list of all pokemons are fetched
-    return Object.keys(this.allTags).length;
+    return Object.keys(this.allTags).length && this.allPokemons.length;
   }
 
   @action
