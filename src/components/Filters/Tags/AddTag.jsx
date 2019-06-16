@@ -1,7 +1,6 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import { Observer } from 'mobx-react-lite';
 
-import Button from '@material-ui/core/Button';
 import AddIcon from '@material-ui/icons/AddCircle';
 
 import { useStore } from '../../StoreContext';
@@ -20,20 +19,18 @@ const AddTag = () => {
   return (
     <Observer>
       {() => (
-        <>
-          <Input
-            value={tag}
-            onChange={e => {
-              setTag(e.target.value);
-            }}
-            placeholder="Search Pokemon by tag"
-            disabled={!store.isTagsActive}
-            appendLabel="Add tag"
-            onAppendClick={handleAddClick}
-            appendIcon={<AddIcon />}
-            appendDisabled={tag === '' || !store.isNewTag(tag)}
-          />
-        </>
+        <Input
+          value={tag}
+          onChange={e => {
+            setTag(e.target.value);
+          }}
+          placeholder="Search Pokemon by tag"
+          disabled={!store.isTagsActive}
+          appendLabel="Add tag"
+          onAppendClick={handleAddClick}
+          appendIcon={<AddIcon />}
+          appendDisabled={tag === '' || !store.isNewTag(tag)}
+        />
       )}
     </Observer>
   );
