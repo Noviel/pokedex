@@ -14,31 +14,33 @@ import { PokemonAvatar } from './PokemonAvatar';
 
 import { useStore } from './StoreContext';
 
-const PokemonInfo = observer(({ name }) => {
+const PokemonDetails = observer(({ name }) => {
   const store = useStore();
   const pokemon = store.getPokemon(name);
-  if (!pokemon) {
-    return <div />;
+
+  let body;
+  if (pokemon) {
+    body = (
+      <>
+        <PokemonAvatar name={name} />
+        <PokemonTags name={name} />
+        <PokemonStats name={name} />
+      </>
+    );
+  } else {
+    body = `Loading`;
   }
+
   return (
     <Card>
-      <CardHeader
-        title={pokemon.name}
-        titleTypographyProps={{ align: 'center' }}
-      />
-      <CardContent>
-        <div>
-          <PokemonAvatar name={name} />
-          <PokemonTags name={name} />
-          <PokemonStats name={name} />
-        </div>
-      </CardContent>
+      <CardHeader title={name} titleTypographyProps={{ align: 'center' }} />
+      <CardContent>{body}</CardContent>
     </Card>
   );
 });
 
-PokemonInfo.propTypes = {
+PokemonDetails.propTypes = {
   name: PropTypes.string,
 };
 
-export { PokemonInfo };
+export { PokemonDetails };
