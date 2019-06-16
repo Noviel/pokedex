@@ -21,7 +21,7 @@ const App = () => {
   return (
     <Container fixed maxWidth="lg">
       <CssBaseline />
-      <Typography className={classes.header} variant="h1" gutterBottom>
+      <Typography className={classes.header} component="h1" variant="h6" gutterBottom>
         Pokedex
       </Typography>
       <TopBar />
