@@ -2,13 +2,12 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { PokemonDetails } from './PokemonDetails';
-import { PokemonInfo } from './PokemonDetails';
 
 const PokemonListItem = ({ isOpen, name }) => {
   const component = isOpen ? (
-    <PokemonDetails name={name} />
+    <div>Not implemented yet</div>
   ) : (
-    <PokemonInfo name={name} />
+    <PokemonDetails name={name} />
   );
   return component;
 };
