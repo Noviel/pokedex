@@ -6,18 +6,7 @@ import Typography from '@material-ui/core/Typography';
 
 import { useStore } from './StoreContext';
 
-const getStatTranslation = statName => {
-  const translations = {
-    attack: 'Attack',
-    defence: 'Defence',
-    speed: 'Speed',
-    hp: 'Health',
-    'special-attack': 'Super Attack',
-    'special-defence': 'Super Defence',
-  };
-
-  return translations[statName];
-};
+import { getStatTranslation } from '../model/Stats';
 
 const Stat = ({ name, value }) => {
   const translation = getStatTranslation(name);
@@ -39,8 +28,6 @@ Stat.propTypes = {
 const PokemonStats = observer(({ name }) => {
   const store = useStore();
   const pokemon = store.getPokemon(name);
-
-  console.log(store.stats);
 
   return (
     <div>
