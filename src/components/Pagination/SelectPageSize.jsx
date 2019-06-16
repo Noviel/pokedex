@@ -9,6 +9,7 @@ import Paper from '@material-ui/core/Paper';
 import Popper from '@material-ui/core/Popper';
 import MenuItem from '@material-ui/core/MenuItem';
 import MenuList from '@material-ui/core/MenuList';
+import Tooltip from '@material-ui/core/Tooltip';
 
 import { useStore } from '../StoreContext';
 
@@ -45,7 +46,10 @@ const SelectPageSize = () => {
         ref={anchorRef}
         aria-label="Split button"
       >
-        <Button>{options[selectedIndex]}</Button>
+        <Tooltip title="Pokemons per page">
+          <Button>{options[selectedIndex]}</Button>
+        </Tooltip>
+        <Tooltip title="Select pokemons per page count">
         <Button
           color="primary"
           variant="contained"
@@ -56,6 +60,7 @@ const SelectPageSize = () => {
         >
           <ArrowDropDownIcon />
         </Button>
+        </Tooltip>
       </ButtonGroup>
       <Popper open={open} anchorEl={anchorRef.current} transition disablePortal>
         {({ TransitionProps, placement }) => (

@@ -7,6 +7,7 @@ import ButtonGroup from '@material-ui/core/ButtonGroup';
 import ArrowLeft from '@material-ui/icons/ArrowLeft';
 import ArrowRight from '@material-ui/icons/ArrowRight';
 import Typography from '@material-ui/core/Typography';
+import Tooltip from '@material-ui/core/Tooltip';
 
 import { SelectPageSize } from './SelectPageSize';
 
@@ -35,22 +36,26 @@ const Pagination = () => {
             aria-label="Split button"
             className={classes.item}
           >
-            <Button
-              color="primary"
-              variant="contained"
-              size="medium"
-              onClick={store.prevPage}
-            >
-              <ArrowLeft />
-            </Button>
-            <Button
-              color="primary"
-              variant="contained"
-              size="medium"
-              onClick={store.nextPage}
-            >
-              <ArrowRight />
-            </Button>
+            <Tooltip title="Previous page">
+              <Button
+                color="primary"
+                variant="contained"
+                size="medium"
+                onClick={store.prevPage}
+              >
+                <ArrowLeft />
+              </Button>
+            </Tooltip>
+            <Tooltip title="Next page">
+              <Button
+                color="primary"
+                variant="contained"
+                size="medium"
+                onClick={store.nextPage}
+              >
+                <ArrowRight />
+              </Button>
+            </Tooltip>
           </ButtonGroup>
 
           <SelectPageSize />
