@@ -42,6 +42,7 @@ const Pagination = () => {
                 variant="contained"
                 size="medium"
                 onClick={store.prevPage}
+                disabled={!store.isPrevPageAvailable}
               >
                 <ArrowLeft />
               </Button>
@@ -52,6 +53,7 @@ const Pagination = () => {
                 variant="contained"
                 size="medium"
                 onClick={store.nextPage}
+                disabled={!store.isNextPageAvailable}
               >
                 <ArrowRight />
               </Button>
