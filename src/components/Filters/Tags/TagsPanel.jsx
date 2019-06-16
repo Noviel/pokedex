@@ -3,13 +3,13 @@ import React from 'react';
 import { TagsList } from './TagsList';
 import { AddTag } from './AddTag';
 
-const Tags = () => {
+const TagsPanel = () => {
   return (
     <>
-      <AddTag />
       <TagsList />
+      <AddTag />
     </>
   );
 };
 
-export { Tags };
+export { TagsPanel };

@@ -7,7 +7,7 @@ import { useStore } from '../../StoreContext';
 
 import { Input } from '../../ui/Input';
 
-const Search = () => {
+const SearchPanel = () => {
   const store = useStore();
   return (
     <Observer>
@@ -18,7 +18,7 @@ const Search = () => {
             label="Search"
             prependIcon={<SearchIcon />}
             onChange={e => {
-              store.search = e.target.value;
+              store.search = e.target.value.toLowerCase();
             }}
             disabled={!store.isSearchActive}
           />
@@ -28,6 +28,6 @@ const Search = () => {
   );
 };
 
-Search.propTypes = {};
+SearchPanel.propTypes = {};
 
-export { Search };
+export { SearchPanel };

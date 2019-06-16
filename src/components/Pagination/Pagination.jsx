@@ -21,8 +21,8 @@ const useStyles = makeStyles(theme => ({
 
 const Pagination = () => {
   const classes = useStyles();
-
   const store = useStore();
+
   return (
     <Observer>
       {() => (

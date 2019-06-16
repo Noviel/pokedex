@@ -11,17 +11,8 @@ import { TopBar } from './TopBar';
 import { BottomBar } from './BottomBar';
 
 const useStyles = makeStyles(theme => ({
-  text: {
+  header: {
     padding: theme.spacing(2, 2, 0),
-  },
-  paper: {
-    paddingBottom: 50,
-  },
-  list: {
-    marginBottom: theme.spacing(2),
-  },
-  subheader: {
-    backgroundColor: theme.palette.background.paper,
   },
 }));
 
@@ -30,7 +21,7 @@ const App = () => {
   return (
     <Container fixed maxWidth="lg">
       <CssBaseline />
-      <Typography className={classes.text} variant="h2" gutterBottom>
+      <Typography className={classes.header} variant="h1" gutterBottom>
         Pokedex
       </Typography>
       <TopBar />

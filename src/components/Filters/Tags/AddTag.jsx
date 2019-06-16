@@ -13,7 +13,7 @@ const AddTag = () => {
   const store = useStore();
 
   const handleAddClick = e => {
-    store.addTag(tag);
+    store.addTag(tag.toLowerCase());
     setTag('');
   };
 
@@ -26,17 +26,13 @@ const AddTag = () => {
             onChange={e => {
               setTag(e.target.value);
             }}
+            placeholder="Search Pokemon by tag"
             disabled={!store.isTagsActive}
+            appendLabel="Add tag"
+            onAppendClick={handleAddClick}
+            appendIcon={<AddIcon />}
+            appendDisabled={tag === '' || !store.isNewTag(tag)}
           />
-          <Button
-            disabled={tag === '' || !store.isNewTag(tag)}
-            color="primary"
-            variant="contained"
-            size="small"
-            onClick={handleAddClick}
-          >
-            <AddIcon />
-          </Button>
         </>
       )}
     </Observer>

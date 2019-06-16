@@ -31,13 +31,17 @@ const Input = props => {
   const {
     inputProps = {},
     label,
+    appendLabel,
     onChange,
     disabled,
     prependIcon,
+    appendIcon,
     placeholder,
     value,
+    onAppendClick,
+    appendDisabled,
   } = props;
-  console.log(props);
+
   const classes = useStyles();
 
   return (
@@ -56,19 +60,33 @@ const Input = props => {
         value={value}
         {...inputProps}
       />
+      {appendIcon && (
+        <IconButton
+          className={classes.iconButton}
+          aria-label={appendLabel}
+          onClick={onAppendClick}
+          disabled={appendDisabled}
+        >
+          {appendIcon}
+        </IconButton>
+      )}
     </Paper>
   );
 };
 
 Input.propTypes = {
   onChange: PropTypes.func,
+  onAppendClick: PropTypes.func,
   disabled: PropTypes.bool,
   prependIcon: PropTypes.node,
   appendIcon: PropTypes.node,
+  appendLabel: PropTypes.string,
+  appendDisabled: PropTypes.bool,
   label: PropTypes.string,
   placeholder: PropTypes.string,
   inputProps: PropTypes.object,
-  value: PropTypes.any
+  value: PropTypes.any,
+  append: PropTypes.object,
 };
 
 Input.defaultProps = {

@@ -11,7 +11,6 @@ const TagsList = () => {
     <Observer>
       {() => (
         <div>
-          Tags:
           {store.tags.map(tag => (
             <Tag key={tag} label={tag} onDelete={store.removeTag}></Tag>
           ))}
