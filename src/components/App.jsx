@@ -2,9 +2,9 @@ import React from 'react';
 
 import { makeStyles } from '@material-ui/core/styles';
 
-import Paper from '@material-ui/core/Paper';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import Typography from '@material-ui/core/Typography';
+import Container from '@material-ui/core/Container';
 
 import { PokemonsList } from './PokemonsList';
 import { TopBar } from './TopBar';
@@ -28,17 +28,15 @@ const useStyles = makeStyles(theme => ({
 const App = () => {
   const classes = useStyles();
   return (
-    <div>
+    <Container fixed maxWidth="lg">
       <CssBaseline />
-      <Paper square className={classes.paper}>
-        <Typography className={classes.text} variant="h2" gutterBottom>
-          Pokedex
-        </Typography>
-        <TopBar />
-        <PokemonsList />
-      </Paper>
+      <Typography className={classes.text} variant="h2" gutterBottom>
+        Pokedex
+      </Typography>
+      <TopBar />
+      <PokemonsList />
       <BottomBar />
-    </div>
+    </Container>
   );
 };
 
