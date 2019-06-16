@@ -28,7 +28,7 @@ const Pagination = () => {
       {() => (
         <>
           <Typography className={classes.item}>
-            Current page: {store.pagination.page + 1}
+            Page: {store.pagination.page + 1}
           </Typography>
           <ButtonGroup
             variant="contained"
