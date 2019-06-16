@@ -9,31 +9,24 @@ import { TagsPanel } from './Filters/Tags/TagsPanel';
 
 const useStyles = makeStyles(theme => ({
   root: {
-    flexGrow: 1,
-  },
-  paper: {
-    padding: theme.spacing(2),
-    textAlign: 'center',
-    color: theme.palette.text.secondary,
+    marginBottom: theme.spacing(2),
   },
 }));
 
 const TopBar = () => {
   const classes = useStyles();
   return (
-    <div>
-      <Grid container fixed spacing={3}>
-        <Grid item xs={12}>
-          <FilterModeToggler />
-        </Grid>
-        <Grid item xs={12} md={6}>
-          <SearchPanel />
-        </Grid>
-        <Grid item xs={12} md={6}>
-          <TagsPanel />
-        </Grid>
+    <Grid container fixed spacing={3} className={classes.root}>
+      <Grid item xs={12}>
+        <FilterModeToggler />
       </Grid>
-    </div>
+      <Grid item xs={12} md={6}>
+        <SearchPanel />
+      </Grid>
+      <Grid item xs={12} md={6}>
+        <TagsPanel />
+      </Grid>
+    </Grid>
   );
 };
 
