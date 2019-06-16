@@ -20,10 +20,6 @@ const SelectPageSize = () => {
   const options = store.pagination.sizes;
   const selectedIndex = store.pagination.sizeIndex;
 
-  function handleClick() {
-    alert(`You clicked ${options[selectedIndex]}`);
-  }
-
   function handleMenuItemClick(event, index) {
     setOpen(false);
     store.setPageSize(index);
@@ -49,7 +45,7 @@ const SelectPageSize = () => {
         ref={anchorRef}
         aria-label="Split button"
       >
-        <Button onClick={handleClick}>{options[selectedIndex]}</Button>
+        <Button>{options[selectedIndex]}</Button>
         <Button
           color="primary"
           variant="contained"
