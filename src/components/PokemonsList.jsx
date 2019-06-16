@@ -3,6 +3,7 @@ import { Observer } from 'mobx-react-lite';
 
 import Grid from '@material-ui/core/Grid';
 import { makeStyles } from '@material-ui/core/styles';
+import Typography from '@material-ui/core/Typography';
 
 import { useStore } from './StoreContext';
 
@@ -28,7 +29,11 @@ const PokemonsList = () => {
               </Grid>
             ))
           ) : (
-            <div>NotFound</div>
+            <Grid item xs={12}>
+              <Typography variant="h6" color="textSecondary" align="center">
+                No Pokemon was found
+              </Typography>
+            </Grid>
           )}
         </Grid>
       )}
