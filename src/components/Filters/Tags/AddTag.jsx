@@ -24,6 +24,7 @@ const AddTag = () => {
           onChange={e => {
             setTag(e.target.value);
           }}
+          onSubmit={handleAddClick}
           placeholder="Search Pokemon by tag"
           disabled={!store.isTagsActive}
           appendLabel="Add tag"
