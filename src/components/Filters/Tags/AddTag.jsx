@@ -26,7 +26,7 @@ const AddTag = () => {
           }}
           onSubmit={handleAddClick}
           placeholder="Search Pokemon by tag"
-          disabled={!store.isTagsActive}
+          disabled={!store.isTagsEnabled}
           appendLabel="Add tag"
           onAppendClick={handleAddClick}
           appendIcon={<AddIcon />}

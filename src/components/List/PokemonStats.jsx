@@ -4,9 +4,9 @@ import { observer } from 'mobx-react-lite';
 
 import Typography from '@material-ui/core/Typography';
 
-import { useStore } from './StoreContext';
+import { useStore } from '../StoreContext';
 
-import { getStatTranslation } from '../model/Stats';
+import { getStatTranslation } from '../../model/Stats';
 
 const Stat = ({ name, value }) => {
   const translation = getStatTranslation(name);

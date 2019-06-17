@@ -12,7 +12,7 @@ import { PokemonStats } from './PokemonStats';
 import { PokemonTags } from './PokemonTags';
 import { PokemonAvatar } from './PokemonAvatar';
 
-import { useStore } from './StoreContext';
+import { useStore } from '../StoreContext';
 
 const PokemonDetails = observer(({ name }) => {
   const store = useStore();

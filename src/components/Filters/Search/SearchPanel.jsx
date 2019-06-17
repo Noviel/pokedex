@@ -20,7 +20,7 @@ const SearchPanel = () => {
             onChange={e => {
               store.search = e.target.value.toLowerCase();
             }}
-            disabled={!store.isSearchActive}
+            disabled={!store.isSearchEnabled}
           />
         </>
       )}

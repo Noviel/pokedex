@@ -6,7 +6,7 @@ import CssBaseline from '@material-ui/core/CssBaseline';
 import Typography from '@material-ui/core/Typography';
 import Container from '@material-ui/core/Container';
 
-import { PokemonsList } from './PokemonsList';
+import { PokemonsList } from './List/PokemonsList';
 import { TopBar } from './TopBar';
 import { BottomBar } from './BottomBar';
 

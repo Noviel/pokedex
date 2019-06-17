@@ -76,10 +76,20 @@ class Pokedex {
   }
 
   @observable search = '';
-  @observable isSearchActive = true;
+  @observable isSearchEnabled = true;
+
+  @computed
+  get isSearchActive() {
+    return this.search.length >= MINIMAL_SEARCH_LENGTH;
+  }
 
   @observable tags = [];
-  @observable isTagsActive = true;
+  @observable isTagsEnabled = true;
+
+  @computed
+  get isTagsActive() {
+    return this.tags.length;
+  }
 
   @observable isGlobalSearch = false;
 
@@ -124,10 +134,10 @@ class Pokedex {
   startApp() {
     this.fetchAllPokemonsNamesAndIds();
     this.fetchPokemonsForPage(0);
-    getStats().then(stats => console.log(stats));
     getTypes().then(typesMap => {
       this.allTags = typesMap;
     });
+
     reaction(
       () => [this.filteredPokemons],
       ([pokemons]) => {
@@ -140,15 +150,6 @@ class Pokedex {
         }
       }
     );
-
-    reaction(
-      () => this.allTags,
-      tags => {
-        Object.keys(tags).map(t => console.log(t.name));
-      }
-    );
-
-    reaction(() => this.pokemonsCurrentPage, pokemons => console.log(pokemons));
 
     reaction(
       () => [this.search, this.tags],
@@ -226,42 +227,53 @@ class Pokedex {
   };
 
   @computed
+  get filterSearch() {
+    if (!this.isSearchActive) {
+      return [];
+    }
+
+    const list = this.isGlobalSearch
+      ? this.allPokemons
+      : Object.keys(this.pokemonsByName).map(name => ({ name }));
+
+    return list
+      .filter(({ name }) => name.includes(this.search))
+      .map(({ name }) => name);
+  }
+
+  @computed
+  get filterTags() {
+    if (!this.isTagsActive) {
+      return [];
+    }
+
+    return this.isGlobalSearch
+      ? Object.keys(this.allTags)
+          .filter(tag => this.tags.includes(tag))
+          .flatMap(tag => this.allTags[tag].pokemon)
+          .filter(uniq)
+          .map(({ pokemon: { name } }) => name)
+      : this.pokemonsByNameList.filter(name =>
+          this.pokemonsByName[name].types.some(({ name }) =>
+            this.tags.includes(name)
+          )
+        );
+  }
+
+  @computed
   get filteredPokemons() {
     if (!this.isFiltered) {
       return this.pokemonsCurrentPage;
     }
 
-    let result = [];
+    const search = this.filterSearch;
+    const tags = this.filterTags;
 
-    if (this.search.length >= MINIMAL_SEARCH_LENGTH) {
-      const list = this.isGlobalSearch
-        ? this.allPokemons
-        : Object.keys(this.pokemonsByName).map(name => ({ name }));
+    const next = this.isSearchActive ? search : this.pokemonsCurrentPage;
 
-      result = list
-        .filter(({ name }) => name.includes(this.search))
-        .map(({ name }) => name);
-    }
-
-    if (this.tags.length) {
-      const pokemonsWithAnyTag = !this.isGlobalSearch
-        ? this.pokemonsByNameList.filter(name =>
-            this.pokemonsByName[name].types.some(({ name }) =>
-              this.tags.includes(name)
-            )
-          )
-        : Object.keys(this.allTags)
-            .filter(tag => this.tags.includes(tag))
-            .flatMap(tag => this.allTags[tag].pokemon)
-            .filter(uniq)
-            .map(({ pokemon: { name } }) => name);
-
-      result = result.length
-        ? result.filter(name => pokemonsWithAnyTag.includes(name))
-        : pokemonsWithAnyTag;
-    }
-
-    return result;
+    return this.isTagsActive
+      ? next.filter(pokemon => tags.includes(pokemon))
+      : search;
   }
 
   @computed

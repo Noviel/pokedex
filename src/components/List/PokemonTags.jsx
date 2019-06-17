@@ -2,9 +2,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { observer } from 'mobx-react-lite';
 
-import { Tag } from './ui/Tag';
+import { Tag } from '../ui/Tag';
 
-import { useStore } from './StoreContext';
+import { useStore } from '../StoreContext';
 
 const PokemonTags = observer(({ name }) => {
   const store = useStore();
