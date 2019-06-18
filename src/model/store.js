@@ -2,6 +2,11 @@ import uniq from 'lodash.uniq';
 import { action, reaction, observable, computed } from 'mobx';
 import { computedFn } from 'mobx-utils';
 
+import { StringFilter, ArrayFilter } from './Filter';
+import { Filters } from './Filters';
+
+import { Pagination } from './Pagination';
+
 import {
   getPokemonsList,
   getAllPokemonsNamesAndIds,
@@ -9,47 +14,6 @@ import {
   getStats,
   getTypes,
 } from '../api';
-
-const defaultPageSizes = [2, 5, 10, 20, 50];
-
-class Pagination {
-  sizes = defaultPageSizes;
-
-  @observable page = 0;
-
-  @computed
-  get size() {
-    return this.sizes[this.sizeIndex];
-  }
-
-  @computed
-  get offset() {
-    return this.page * this.size;
-  }
-
-  @observable sizeIndex = 0;
-
-  constructor({ parent, sizes } = {}) {
-    if (sizes) {
-      this.sizes = sizes;
-    }
-
-    this.sizeIndex = Math.floor(this.sizes.length / 2);
-    this.prevSize = -1;
-
-    reaction(
-      () => this.size,
-      size => {
-        /*
-          Calculate new page index based on previous pagination state to display the same
-          first Pokemon
-        */
-        const offset = this.page * this.prevSize;
-        this.page = Math.floor(offset / this.size);
-      }
-    );
-  }
-}
 
 const MINIMAL_SEARCH_LENGTH = 2;
 
@@ -70,31 +34,50 @@ class Pokedex {
   */
   @observable pokemonsByName = {};
 
+  @observable filters = new Filters([
+    {
+      type: 'string',
+      ctx: {
+        list: () => {
+          return this.isGlobalSearch
+            ? this.allPokemons
+            : Object.keys(this.pokemonsByName).map(name => ({ name }));
+        },
+        test: item => item.name,
+        output: item => item.name,
+      },
+    },
+    {
+      type: 'array',
+      ctx: {
+        list: () => {},
+        filter: () => {
+          const data = this.isGlobalSearch ? this.allTags : this.pokemonsByName;
+
+          const searchList = this.tags;
+
+          const list = Object.keys(data);
+
+          return this.isGlobalSearch
+            ? list
+                .filter(tag => searchList.includes(tag))
+                .flatMap(tag => data[tag].pokemon)
+                .filter(uniq)
+                .map(({ pokemon: { name } }) => name)
+            : list.filter(name =>
+                data[name].types.some(({ name }) => searchList.includes(name))
+              );
+        },
+      },
+    },
+  ]);
+
   @computed
   get pokemonsByNameList() {
     return Object.keys(this.pokemonsByName);
   }
 
-  @observable search = '';
-  @observable isSearchEnabled = true;
-
-  @computed
-  get isSearchActive() {
-    return this.search.length >= MINIMAL_SEARCH_LENGTH;
-  }
-
-  @observable tags = [];
-  @observable isTagsEnabled = true;
-
-  @computed
-  get isTagsActive() {
-    return this.tags.length;
-  }
-
-  @observable isGlobalSearch = false;
-
   pagination = new Pagination({ parent: this });
-  paginationWithFilters = new Pagination({ parent: this });
 
   /*
     Names of pokemons to display
@@ -134,6 +117,7 @@ class Pokedex {
   startApp() {
     this.fetchAllPokemonsNamesAndIds();
     this.fetchPokemonsForPage(0);
+
     getTypes().then(typesMap => {
       this.allTags = typesMap;
     });
@@ -167,12 +151,7 @@ class Pokedex {
     reaction(
       () => [this.pagination.page],
       ([page]) => {
-        if (this.isFiltered) {
-          // this.visiblePokemons = this.filteredPokemons.slice(
-          //   page * this.pagination.size,
-          //   (1 + page) * this.pagination.size
-          // );
-        } else {
+        if (!this.isFiltered) {
           this.fetchPokemonsForPage(page);
         }
       }
@@ -228,36 +207,12 @@ class Pokedex {
 
   @computed
   get filterSearch() {
-    if (!this.isSearchActive) {
-      return [];
-    }
-
-    const list = this.isGlobalSearch
-      ? this.allPokemons
-      : Object.keys(this.pokemonsByName).map(name => ({ name }));
-
-    return list
-      .filter(({ name }) => name.includes(this.search))
-      .map(({ name }) => name);
+    return this.filters[0].filtered;
   }
 
   @computed
   get filterTags() {
-    if (!this.isTagsActive) {
-      return [];
-    }
-
-    return this.isGlobalSearch
-      ? Object.keys(this.allTags)
-          .filter(tag => this.tags.includes(tag))
-          .flatMap(tag => this.allTags[tag].pokemon)
-          .filter(uniq)
-          .map(({ pokemon: { name } }) => name)
-      : this.pokemonsByNameList.filter(name =>
-          this.pokemonsByName[name].types.some(({ name }) =>
-            this.tags.includes(name)
-          )
-        );
+    return this.filters[1].filtered;
   }
 
   @computed
@@ -279,14 +234,6 @@ class Pokedex {
   @computed
   get isFiltered() {
     return this.tags.length || this.search.length >= MINIMAL_SEARCH_LENGTH;
-  }
-
-  @computed
-  get searchStatus() {
-    if (this.search.length && this.search.length < MINIMAL_SEARCH_LENGTH) {
-      return `You need to enter atleast ${MINIMAL_SEARCH_LENGTH} symbols`;
-    }
-    return '';
   }
 
   @computed
@@ -336,55 +283,6 @@ class Pokedex {
     // Global search is ready if types with belonging pokemons and list of all pokemons are fetched
     return Object.keys(this.allTags).length && this.allPokemons.length;
   }
-
-  @action
-  addTag = tag => {
-    if (!this.tags.includes(tag)) {
-      this.tags.push(tag);
-    }
-  };
-
-  @action
-  removeTag = tag => {
-    this.tags = this.tags.filter(t => t !== tag);
-  };
-
-  isNewTag = computedFn(function isNewTag(tag) {
-    return !this.tags.includes(tag);
-  });
-
-  @action
-  setPageSize = sizeIndex => {
-    this.pagination.prevSize = this.pagination.size;
-    this.pagination.sizeIndex = sizeIndex;
-  };
-
-  @computed
-  get isNextPageAvailable() {
-    return this.isFiltered
-      ? this.pagination.offset + this.pagination.size <
-          this.filteredPokemons.length
-      : this.visiblePokemons.length >= this.filteredPokemons.length;
-  }
-
-  @computed
-  get isPrevPageAvailable() {
-    return this.pagination.page !== 0;
-  }
-
-  @action
-  nextPage = () => {
-    if (this.isNextPageAvailable) {
-      this.pagination.page++;
-    }
-  };
-
-  @action
-  prevPage = () => {
-    if (this.isPrevPageAvailable) {
-      this.pagination.page--;
-    }
-  };
 }
 
 export const createStore = () => {
